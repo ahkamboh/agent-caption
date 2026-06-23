@@ -98,6 +98,7 @@ Needs `demucs` (installed by `python setup.py`); falls back to the original audi
 - `isolate_vocals.py` — **Demucs** vocal isolation for songs + a music-vs-speech probe; used by `--content`.
 - `qa.py` — fast deterministic **QA gate** (cue sanity + ffprobe output check) → `work/<base>.qa.json`. Runs automatically after every burn; `--strict` makes a broken output exit non-zero.
 - `footprint.py` — renders `<base>.footprint.svg`: a **one-glance caption-health map** (each word colored by forced-align confidence + gap markers + verdict). Auto-runs after each caption; `--no-footprint` to skip.
+- `benchmark.py` — measure the real accuracy gain: WER of the old default (small) vs the new default (large-v3 [+ Demucs]) against a reference transcript. `PY scripts/benchmark.py CLIP --ref truth.txt [--music] [--hinglish]`.
 - `caption.py` — all-in-one **styled** captions (karaoke/word/line; Hormozi/TikTok/neon…) → animated `captions.js`.
 
 ## Caption a video (the main job) — default language = English

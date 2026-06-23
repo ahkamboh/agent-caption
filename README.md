@@ -127,6 +127,7 @@ local-caption/
 │  ├─ grammar_fix.py       offline homophone fix (their/there)
 │  ├─ qa.py                fast QA gate → qa.json (cue + output checks)
 │  ├─ footprint.py         caption-health map → footprint.svg
+│  ├─ benchmark.py         WER: old (small) vs new (large-v3) accuracy
 │  ├─ export-subs.py       words → .srt / .vtt
 │  ├─ multilang-subs.py    offline subtitle translation
 │  └─ validate_timing.py
