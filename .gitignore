@@ -1,0 +1,22 @@
+# venv + caches
+.venv-whisperx/
+__pycache__/
+*.pyc
+
+# working files + model caches
+work/
+out/
+models/
+
+# media + generated captions (don't commit user media)
+*.mp4
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.m4a
+*.srt
+*.vtt
+captioned*.mp4
+
+.DS_Store
