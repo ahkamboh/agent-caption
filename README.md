@@ -1,133 +1,135 @@
-# local-caption — add captions to any video, in any language, for any AI agent
+# 🎬 local-caption
 
-**Free & open-source captioning that any AI agent can run — on Windows, macOS, and Linux.** Add accurate, perfectly-timed captions / subtitles to **any video or song**, in **any language** (English by default), for both **speech and music** — with first-class **Hinglish / code-switched** support. Words come from speech recognition; **timing comes from forced alignment on the waveform**, so captions never drift early or late.
+**Add captions to any video — in any language — with one command.**
+Free, open-source, and 100% local. Works for talking videos *and* songs, with first-class **Hinglish**.
 
-> Built for **Claude Code, Cursor, Codex, Grok**, and any IDE/agent. Point your agent at this repo and ask it to caption your video.
+![License](https://img.shields.io/badge/license-MIT-green) ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![Platforms](https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-lightgrey) ![Local](https://img.shields.io/badge/100%25-local%20·%20offline-success) ![Languages](https://img.shields.io/badge/languages-99-orange)
 
-## ⚡ Setup prompt — paste this into your AI agent
-Clone the repo, open it in your agent (Claude Code / Cursor / Codex / Grok / any), then paste:
+Words come from speech recognition; **timing comes from forced alignment on the waveform** — so captions never drift early or late, even if a word is spelled wrong. Nothing is uploaded. It just works.
+
+---
+
+## 🚀 Quick start
+
+```bash
+python setup.py                 # one time: installs everything + the model
+python caption.py myvideo.mp4   # → myvideo.captioned.mp4
+```
+
+That's the whole thing. Captions are auto-sized to fit any video (landscape or vertical), English by default, best accuracy out of the box.
+
+---
+
+## 🎛 Common options
+
+Same command, add a flag:
+
+| You want… | Add this |
+|---|---|
+| Hinglish / mixed Hindi-English | `--hinglish` |
+| A song (isolate the vocals first) | `--content music` |
+| A famous look | `--style hormozi` *(15 styles)* |
+| A different language | `--lang ur` |
+| Bigger / re-positioned | `--size 6 --pos center` |
+| Names spelled right | `--glossary "Xaibridge, Kamboh"` |
+| You already have the lyrics/script | `--script lyrics.txt` *(100% accurate words)* |
+| Fix their/there, your/you're | `--grammar` |
+| Just a subtitle file | `--srt` |
+| Faster (lower accuracy) | `--fast` |
+
+---
+
+## 🌍 Languages
+
+| Capability | How many |
+|---|---|
+| **Recognize & caption** (Whisper) | **99 languages** |
+| **Frame-accurate word timing** (whisperX) | **38 languages** |
+| **Universal time-alignment** (MMS) | **1100+ languages** |
+| **Default** | **English** |
+| **Mixed / code-switch** | **Hinglish** + any |
+
+<details open>
+<summary><b>All 99 languages it can caption</b></summary>
+
+> Afrikaans · Albanian · Amharic · Arabic · Armenian · Assamese · Azerbaijani · Bashkir · Basque · Belarusian · Bengali · Bosnian · Breton · Bulgarian · Burmese · Cantonese · Catalan · Chinese · Croatian · Czech · Danish · Dutch · English · Estonian · Faroese · Finnish · French · Galician · Georgian · German · Greek · Gujarati · Haitian Creole · Hausa · Hawaiian · Hebrew · Hindi · Hungarian · Icelandic · Indonesian · Italian · Japanese · Javanese · Kannada · Kazakh · Khmer · Korean · Lao · Latin · Latvian · Lingala · Lithuanian · Luxembourgish · Macedonian · Malagasy · Malay · Malayalam · Maltese · Maori · Marathi · Mongolian · Nepali · Norwegian · Nynorsk · Occitan · Pashto · Persian · Polish · Portuguese · Punjabi · Romanian · Russian · Sanskrit · Serbian · Shona · Sindhi · Sinhala · Slovak · Slovenian · Somali · Spanish · Sundanese · Swahili · Swedish · Tagalog · Tajik · Tamil · Tatar · Telugu · Thai · Tibetan · Turkish · Turkmen · Ukrainian · Urdu · Uzbek · Vietnamese · Welsh · Yiddish · Yoruba
+
+</details>
+
+*Any language outside the 38 “frame-accurate” set still works — it just routes to MMS for timing. And with `--script` you can caption a language perfectly by supplying its text.*
+
+---
+
+## 🎨 Caption styles
+
+15 ready-made looks (bundled fonts — Poppins, Anton, Bebas Neue, Archivo Black):
+
+`clean` · `bold` · `hormozi` · `green` · `beast` · `impact` · `bebas` · `tiktok` · `pill` · `boxed` · `yellow` · `neon` · `gradient` · `minimal` · `subtitle`
+
+Or describe your own: `--fill "#ff3da6" --box "#000a" --caps --font Anton-Regular.ttf`
+
+---
+
+## 🗂 Project structure
+
+```
+local-caption/
+├─ caption.py            ← THE command: video in, captioned video out
+├─ setup.py              ← one-time install (.venv + model download)
+├─ requirements.txt
+│
+├─ scripts/             # the engine
+│  ├─ align.py             forced alignment → frame-accurate timing
+│  ├─ transcribe.py        Whisper → words
+│  ├─ cs_transcribe.py     Hinglish / code-switch words
+│  ├─ mms_align.py         universal aligner (1100+ languages)
+│  ├─ isolate_vocals.py    Demucs vocal isolation for songs
+│  ├─ grammar_fix.py       offline homophone fix (their/there)
+│  ├─ export-subs.py       words → .srt / .vtt
+│  ├─ multilang-subs.py    offline subtitle translation
+│  └─ validate_timing.py
+│
+├─ assets/fonts/        # 5 bundled caption fonts
+│
+├─ SKILL.md             # the playbook your AI agent follows
+├─ CLAUDE.md · AGENTS.md · .cursorrules   # auto-read pointers per agent
+└─ README.md
+```
+
+---
+
+## ⚙️ How it works
+
+1. **(songs) Isolate** — on music, Demucs lifts the vocal out of the backing track.
+2. **Words** — Whisper transcribes the speech (or you supply them with `--script`).
+3. **Timing** — every word is force-aligned to the waveform, so it lands exactly on the sound.
+4. **Burn** — clean, proportional captions are rendered and overlaid → `*.captioned.mp4`.
+
+---
+
+## 🤖 Use it with any AI agent
+
+Open the folder in **Claude Code / Cursor / Codex / Grok** — they auto-read the pointer files, so just say *“caption ./myvideo.mp4”*. For any other agent, paste this:
 
 ```
 You are a captioning agent. Read ./SKILL.md in this repo and follow it exactly.
+Goal: add accurate, perfectly-timed captions to the video/audio I give you,
+in any language (default English; Hinglish supported), for speech AND music.
 
-Goal: add accurate, perfectly-timed captions to the video/audio I give you, in any
-language (default English; Hinglish supported), for both speech AND music.
-
-Do this:
-1. if ./.venv-whisperx isn't set up yet, run:  python setup.py
-2. ask me for the media file path (and the language if it isn't English)
-3. caption it with ONE command:  python caption.py <file>
-     - Hinglish:           --hinglish
-     - a song / music:     --content music
-     - a famous look:      --style hormozi|tiktok|beast|...   (15 styles)
-     - names/brands so they're not mis-heard:   --glossary "name1, name2"
-     - you already have the exact words/lyrics:  --script lyrics.txt   (100% accurate)
+1. if ./.venv-whisperx isn't set up, run:  python setup.py
+2. ask me for the file path (and language if not English)
+3. caption it:  python caption.py <file>   (--hinglish, --content music,
+   --style <name>, --glossary "...", --script lyrics.txt as needed)
 4. show me the output path (<file>.captioned.mp4)
-
-It uses Whisper large-v3 by default (best accuracy) and times every word by forced
-alignment on the waveform, so captions never drift. Read SKILL.md, then ask me for the file.
 ```
 
-Agents auto-read the pointer files, so you often don't even need the prompt:
-- **Claude Code** — open the folder; it reads `CLAUDE.md`. Just say *"caption ./myvideo.mp4"*.
-- **Cursor** — reads `.cursorrules`. Say *"caption ./reel.mp4 in hinglish"*.
-- **Codex** — reads `AGENTS.md`. Same.
-- **Grok / ChatGPT / any chat agent** — paste the prompt above + the contents of `SKILL.md`.
+---
 
-## ⚡ Easiest way — ONE command
+## 📦 Requirements
 
-```bash
-python caption.py myvideo.mp4
-```
+- **Python 3.10+** and **ffmpeg** (`brew` / `apt` / `winget install ffmpeg`)
+- ~4 GB disk — `python setup.py` downloads the model for you (first caption is instant)
 
-That's it. It transcribes, aligns the timing to the audio, and burns clean captions that are **auto-sized and positioned to fit the video** (proportional on any resolution — landscape *or* vertical), English by default → `myvideo.captioned.mp4`. Best accuracy out of the box (**Whisper large-v3 by default**). No styling, no tweaking. Works even if your ffmpeg lacks libass (it falls back to rendering captions and compositing them with the core `overlay` filter).
+## 📄 License
 
-**Power users** — same command, optional flags:
-```bash
-python caption.py reel.mp4 --hinglish --style tiktok     # Hinglish + TikTok box look
-python caption.py talk.mp4 --style hormozi --pos center  # big bold caps, centered
-python caption.py clip.mp4 --lang ur --size 6            # Urdu, slightly larger
-python caption.py talk.mp4 --fast                        # small model = faster (lower accuracy)
-python caption.py vid.mp4  --fill "#ff3da6" --box "#000a" --caps   # describe your OWN look
-python caption.py vid.mp4  --srt                         # just write the .srt, no burn
-python caption.py vid.mp4  --from-srt my.srt             # burn an existing .srt, proportioned
-```
-
-### 🎯 Accuracy — for when the words must be exactly right (free, local, no human)
-Timing is correct by construction (forced alignment). The only thing that can go wrong is a
-**mis-heard word** — a name, slang, or a homophone like *their/there*. Three free levers fix that:
-
-```bash
-python caption.py talk.mp4 --glossary "Xaibridge, Hinglish, Kamboh"   # bias ASR to your names/brands
-python caption.py song.mp4 --script lyrics.txt                        # you have the text? 100% accurate words
-python caption.py talk.mp4 --grammar                                  # offline their/there, your/you're fix
-python caption.py talk.mp4 --glossary names.txt --grammar            # stack them for max accuracy
-```
-- **`--glossary`** biases recognition toward your terms (a list or a `.txt`) — biggest win on names.
-- **`--script`** skips ASR and only *times* the words you give it → content is **100% correct**.
-- **`--grammar`** runs **LanguageTool locally** (no upload, no tokens) to fix homophones; timing untouched.
-  Enable once: `python setup.py --grammar` (needs Java/JRE 8+) — it skips cleanly if not installed.
-
-### 🎵 Songs — isolate the vocals (`--content`)
-On music, captioning the **isolated vocal stem** (Demucs) instead of the full mix makes lyric
-transcription far cleaner. It's conditional — it only helps on songs — so it's gated:
-```bash
-python caption.py song.mp4 --content music       # force vocal isolation before ASR
-python caption.py clip.mp4                        # default 'auto': detects music, isolates only then
-python caption.py podcast.mp4 --content speech    # never isolate (clean speech doesn't need it)
-```
-`auto` runs a quick music/speech probe so podcasts/interviews are never slowed. The captions still
-burn onto your original video — only the audio we transcribe is the cleaned stem.
-
-**15 famous styles** (bundled fonts included — Poppins, Anton, Bebas Neue, Archivo Black):
-`clean` · `bold` · `hormozi` · `green` · `beast` · `impact` · `bebas` · `tiktok` · `pill` · `boxed` · `yellow` · `neon` · `gradient` · `minimal` · `subtitle`
-
-## Requirements
-- **Python 3.10+** — torch supports 3.14; if `whisperx` lacks a wheel on a brand-new version, use 3.11–3.12
-- **ffmpeg** — macOS `brew install ffmpeg` · Ubuntu `sudo apt install ffmpeg` · Windows `winget install ffmpeg`
-- ~4 GB disk for models — `python setup.py` **downloads `large-v3` for you** (the default — best accuracy, instant first caption). Add `python setup.py --small` to also fetch the small model for `--fast`.
-
-## Run it yourself (no agent)
-Set up once, then call scripts with the venv's python.
-
-```bash
-python setup.py        # creates ./.venv-whisperx and installs everything (Win/Mac/Linux)
-```
-
-`PY` below = the venv python:
-**macOS/Linux** `./.venv-whisperx/bin/python` · **Windows** `.venv-whisperx\Scripts\python`
-
-```bash
-# speech, English (default):
-PY scripts/align.py video.mp4 --lang en --out work/transcript.json
-PY scripts/export-subs.py work/transcript.json --out work/subs
-ffmpeg -i video.mp4 -vf "subtitles=work/subs.srt" -c:a copy captioned.mp4
-
-# Hinglish / mixed Hindi-English:
-PY scripts/align.py video.mp4 --code-switch --dual hi en --out work/transcript.json
-
-# translate captions into many languages (offline):
-PY scripts/multilang-subs.py work/subs.srt --to "hi,ur,es,fr,ar"
-
-# styled TikTok / Hormozi animated captions:
-PY scripts/caption.py video.mp4 --lang en --content speech --style karaoke --preset hormozi --out out/
-```
-
-## What it does
-- captions in **any language** — English by default, **Hinglish / code-switched** first-class, 1100+ languages aligned (MMS_FA)
-- works on **speech and music / lyrics** — with optional **Demucs vocal isolation** for songs (`--content`)
-- **Whisper large-v3 by default** (best accuracy) + an **accuracy stack** (`--glossary` / `--script` / `--grammar`) to kill mis-heard words, all local
-- **forced alignment** = frame-accurate timing, never early or late
-- outputs **.srt / .vtt** (great for YouTube — selectable + SEO), a burned-in video, or animated styled captions
-- **15 famous burn styles** with **bundled fonts** (Poppins/Anton/Bebas Neue/Archivo Black) — hormozi, beast, tiktok, gradient, neon, pill, bebas… via `--style <name>`
-- translate subtitles into 30+ languages, fully **offline**
-- runs on **Windows, macOS, Linux** · 100% local · free · **MIT**
-
-## How it works
-1. **(songs) Isolate** — on music, Demucs separates the vocal stem so Whisper isn't fighting the backing track.
-2. **Words** — Whisper / faster-whisper transcribes the audio (per-segment language ID handles code-switching like Hinglish); or supply your own with `--script`.
-3. **Timing** — those words are force-aligned to the waveform (whisperX for 40+ languages, MMS_FA for 1100+). Timing comes from the audio, not the spelling — so text errors never cause drift.
-4. **Output** — `.srt` / `.vtt`, a burned-in video, or an animated `captions.js` for motion graphics.
-
-## License
-MIT — free for anyone, including AI agents. Built by [Ali Hamza Kamboh](https://alihamzakamboh.com).
+**MIT** — free for anyone, including AI agents. Built by [Ali Hamza Kamboh](https://alihamzakamboh.com).
