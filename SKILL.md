@@ -11,7 +11,7 @@ python setup.py        # cross-platform: creates ./.venv-whisperx and installs e
 # macOS/Linux convenience: bash setup.sh      ·      Windows convenience: setup.bat
 ```
 ffmpeg: macOS `brew install ffmpeg` · Ubuntu `sudo apt install ffmpeg` · Windows `winget install ffmpeg`.
-Models (Whisper `small`, MMS_FA, whisperX) auto-download on first run.
+Models (Whisper **`large-v3`** — the default — MMS_FA, whisperX) auto-download on first run.
 
 ## Easiest path — the one-command wrapper (PREFER THIS)
 For "caption this video" requests, just run the top-level wrapper. It does transcribe → align →
@@ -28,8 +28,9 @@ python caption.py <video> --from-srt FILE                  # burn an existing .s
 `pill` `boxed` `yellow` `neon` `gradient` `minimal` `subtitle`. Drop to the individual scripts below
 only when you need the raw transcript, custom rendering, or translation.
 
-**Best accuracy:** add `--accurate` (uses `openai/whisper-large-v3`). The Hinglish path already uses
-large-v3. Pre-fetch it once with `python setup.py --large` (otherwise it downloads on first `--accurate`).
+**Model:** `large-v3` is the **DEFAULT** (best accuracy) — no flag needed; `setup.py` pre-fetches it.
+Want speed on clean English? add `--fast` (small model). `--accurate` still exists but is redundant now.
+The Hinglish path always uses large-v3.
 
 **Custom style — build ANY look the user describes.** Map the user's words to these flags (they override
 `--style`):
@@ -44,6 +45,43 @@ python caption.py v.mp4 --fill "#ff3da6" --box "#10141ae0" --caps --font Anton-R
 ```
 To make a brand-new **named** style permanent, add an entry to the `STYLES` dict in `caption.py`.
 
+## Accuracy — kill mis-heard words (free, no tokens, no human glance)
+Forced alignment makes *timing* correct by construction. The only thing it can't fix is whether a
+word was **heard** right ("their"/"there", names, slang). Three free levers push that toward zero:
+
+- **`--glossary "..."`** — feed names/brands/slang (a list **or** a `.txt` path). Biases the ASR's
+  initial-prompt so proper nouns stop being mis-heard. Biggest single win on names. One-time list.
+  ```
+  python caption.py talk.mp4 --glossary "Xaibridge, Hinglish, Xotion, Kamboh"
+  ```
+- **`--script FILE`** — if the correct words already exist (lyrics, a script), pass them. The tool
+  **skips ASR entirely** and only force-aligns the *given* words → **100% content accuracy**.
+  ```
+  python caption.py song.mp4 --script lyrics.txt
+  ```
+- **`--grammar`** — offline homophone/grammar pass over the captions ("their"→"there", "your"→"you're").
+  Runs LanguageTool **locally** (no upload, no tokens); timing is never touched. Optional dependency —
+  enable once with `python setup.py --grammar` (needs Java/JRE 8+); skips cleanly if absent.
+  ```
+  python caption.py talk.mp4 --accurate --glossary names.txt --grammar    # stack them
+  ```
+Bang-for-buck order: `--glossary` (names) → `--script` (when text exists) → `--grammar` (homophones).
+The base model is already `large-v3` by default. The only residue these can't catch needs a human or an LLM — that's
+the one cost worth spending tokens on, and only on the flagged words, not the whole transcript.
+
+### Songs — isolate the vocals first (`--content`)
+For music, separating the vocal stem before ASR makes lyric transcription far cleaner (Whisper stops
+fighting the backing track). It's **conditional** — pointless/slow on clean speech — so it's gated:
+```
+python caption.py song.mp4 --content music                 # force vocal isolation (demucs)
+python caption.py clip.mp4                                  # --content auto (default): detects music, isolates only then
+python caption.py podcast.mp4 --content speech              # never isolate (or --no-isolate)
+python caption.py song.mp4 --content music --script lyrics.txt   # cleanest songs: known words, timed on the vocal stem
+```
+`auto` runs a quick music/speech probe and isolates ONLY when it hears music — so podcasts/interviews
+are never slowed. Burning always uses the original video; only what we transcribe/align is the stem.
+Needs `demucs` (installed by `python setup.py`); falls back to the original audio if absent.
+
 ## Always run scripts with the venv's python — written here as `PY`:
 - **macOS / Linux:** `PY` = `./.venv-whisperx/bin/python`
 - **Windows:** `PY` = `.venv-whisperx\Scripts\python`
@@ -56,6 +94,8 @@ To make a brand-new **named** style permanent, add an entry to the `STYLES` dict
 - `validate_timing.py` — timing sanity-check used by the code-switch path.
 - `export-subs.py` — transcript → `.srt` + `.vtt`.
 - `multilang-subs.py` — translate subtitles into many languages, **offline**.
+- `grammar_fix.py` — **offline** homophone/grammar fix on an `.srt` (timing preserved); used by `--grammar`.
+- `isolate_vocals.py` — **Demucs** vocal isolation for songs + a music-vs-speech probe; used by `--content`.
 - `caption.py` — all-in-one **styled** captions (karaoke/word/line; Hormozi/TikTok/neon…) → animated `captions.js`.
 
 ## Caption a video (the main job) — default language = English

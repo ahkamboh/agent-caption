@@ -21,6 +21,18 @@ OPTIONS (all optional):
     --translate "hi,es"   also write translated .srt files
     --out FILE      output path (default: <video>.captioned.mp4)
 
+ACCURACY (push mis-heard words toward zero — all free, no tokens, no human glance):
+    --glossary "..."  names/brands/slang (or a .txt path) to bias ASR so proper nouns
+                      aren't mis-heard. One-time list -> big win.
+    --script FILE     the EXACT correct words/lyrics. Skips ASR, only TIMES them ->
+                      100%% content accuracy when you already have the text.
+    --grammar         offline homophone/grammar fix (their/there, your/you're).
+                      Needs language_tool_python + Java; skips cleanly if absent.
+    --content auto|music|speech   SONGS: isolate vocals (demucs) before ASR for far
+                      cleaner lyric transcription. auto (default) detects music and
+                      isolates only then; music forces it; speech never isolates.
+    --no-isolate      never run vocal isolation, even on music.
+
 STYLES: clean bold hormozi green beast impact bebas tiktok pill boxed yellow neon gradient minimal subtitle
 """
 import os
@@ -262,9 +274,22 @@ def main():
     ap.add_argument("--pos", default="bottom", choices=list(ALIGN))
     ap.add_argument("--size", type=float, default=0.0, help="override caption height %% of video height")
     ap.add_argument("--font", default=None, help="bundled font name or path to a .ttf")
-    ap.add_argument("--model", default="small", choices=["small", "medium", "large-v3"],
-                    help="ASR model. small = fast (default); large-v3 = best accuracy (~3GB, slower)")
-    ap.add_argument("--accurate", action="store_true", help="use openai/whisper-large-v3 (best quality)")
+    ap.add_argument("--model", default="large-v3", choices=["small", "medium", "large-v3"],
+                    help="ASR model. large-v3 = best accuracy (DEFAULT); small/medium = faster, less accurate")
+    ap.add_argument("--accurate", action="store_true", help="(already the default) force whisper large-v3")
+    ap.add_argument("--fast", action="store_true", help="use the small model for speed (lower accuracy)")
+    # --- accuracy stack: kill mis-heard words for free (no tokens, no human) ---
+    ap.add_argument("--glossary", default=None,
+                    help="names/brands/slang (comma/space list OR a .txt path) to bias ASR")
+    ap.add_argument("--script", default=None,
+                    help="path to (or literal text of) the EXACT words/lyrics; skips ASR, only times them")
+    ap.add_argument("--grammar", action="store_true",
+                    help="offline homophone/grammar fix on the captions (needs language_tool_python + Java)")
+    ap.add_argument("--content", default="auto", choices=["auto", "music", "speech"],
+                    help="songs: isolate vocals (demucs) before ASR. auto=detect & isolate only music; "
+                         "music=force; speech=never (default: auto)")
+    ap.add_argument("--no-isolate", dest="no_isolate", action="store_true",
+                    help="never run demucs vocal isolation, even for music")
     # --- custom style: describe ANY look; these override the chosen --style ---
     ap.add_argument("--fill", default=None, help="text colour, e.g. #ff2e88")
     ap.add_argument("--outline", default=None, help="outline colour, e.g. #000000")
@@ -286,20 +311,60 @@ def main():
             sys.exit(f"!! {tool} not found — install ffmpeg (brew/apt/winget install ffmpeg).")
     if not os.path.exists(a.video):
         sys.exit(f"!! no such file: {a.video}")
-    model = "large-v3" if a.accurate else a.model
+    model = "small" if a.fast else ("large-v3" if a.accurate else a.model)
+
+    # glossary -> a clean comma list for the ASR initial-prompt (accepts a .txt path or inline list)
+    glossary = a.glossary
+    if glossary and os.path.exists(glossary):
+        glossary = open(glossary, encoding="utf-8").read()
+    if glossary:
+        glossary = ", ".join(t.strip() for t in re.split(r"[,\n]", glossary) if t.strip())
 
     os.makedirs("work", exist_ok=True)
     base = os.path.splitext(os.path.basename(a.video))[0]
+
+    # SONGS: isolate the vocal stem before ASR/alignment (cleaner words + timing on music).
+    # Burning always uses the ORIGINAL video; only what we transcribe/align changes.
+    align_src = a.video
+    if not a.from_srt and not a.no_isolate and a.content in ("auto", "music"):
+        sys.path.insert(0, os.path.join(HERE, "scripts"))
+        import isolate_vocals as iv
+        do_isolate = a.content == "music"
+        if a.content == "auto":
+            is_music, why = iv.looks_like_music(a.video)
+            print(f"[local-caption] content probe -> {'music' if is_music else 'speech'} ({why})")
+            do_isolate = is_music
+        if do_isolate:
+            print("[local-caption] isolating vocals (demucs) for cleaner transcription ...")
+            stem = iv.isolate(a.video)
+            if stem:
+                align_src = stem
+                print(f"[local-caption] aligning on isolated vocal stem -> {stem}")
+            else:
+                print("[local-caption] vocal isolation unavailable — using original audio.")
+
     srt = a.from_srt
     if not srt:
         tj = os.path.join("work", f"{base}.transcript.json")
-        cmd = _py("scripts", "align.py") + [a.video, "--out", tj, "--model", model]
-        cmd += (["--code-switch", "--dual", "hi", "en"] if a.hinglish else ["--lang", a.lang])
-        print(f"[local-caption] transcribing + aligning ({'hinglish' if a.hinglish else a.lang}, {model}) ...")
+        cmd = _py("scripts", "align.py") + [align_src, "--out", tj, "--model", model]
+        if a.script:                       # known-correct words -> time only, 100% content accuracy
+            cmd += ["--script", a.script, "--lang", a.lang]
+            print(f"[local-caption] using your script — timing only, no ASR (100% content accuracy) ...")
+        else:
+            cmd += (["--code-switch", "--dual", "hi", "en"] if a.hinglish else ["--lang", a.lang])
+            if glossary:
+                cmd += ["--initial-prompt", glossary]
+            print(f"[local-caption] transcribing + aligning "
+                  f"({'hinglish' if a.hinglish else a.lang}, {model}"
+                  f"{', glossary' if glossary else ''}) ...")
         if subprocess.run(cmd).returncode != 0 or not os.path.exists(tj):
             sys.exit("!! transcription failed. Run `python setup.py` first (installs the engine + model).")
         subprocess.run(_py("scripts", "export-subs.py") + [tj, "--out", os.path.join("work", base)], check=True)
         srt = os.path.join("work", f"{base}.srt")
+
+    if a.grammar:                          # offline homophone/grammar fix (timing untouched)
+        print("[local-caption] grammar/homophone pass (offline) ...")
+        subprocess.run(_py("scripts", "grammar_fix.py") + [srt, "--lang", a.lang], check=False)
 
     if a.translate:
         subprocess.run(_py("scripts", "multilang-subs.py") + [srt, "--to", a.translate], check=False)

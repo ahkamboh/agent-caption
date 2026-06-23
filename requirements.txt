@@ -13,3 +13,11 @@ argostranslate
 uroman
 # Pillow renders burned-in captions when your ffmpeg lacks libass (the fallback path):
 Pillow
+# Demucs isolates the vocal stem before ASR on SONGS (--content music/auto) -> far cleaner lyrics:
+demucs
+# librosa powers the music-vs-speech probe (so isolation runs only on songs) + onset timing refine:
+librosa
+# --- OPTIONAL accuracy extra (not installed by default — keeps the base light & Java-free) ---
+# Offline homophone/grammar fix for --grammar (their/there, your/you're). Needs a JRE 8+.
+# Install with:  python setup.py --grammar   (or: pip install language_tool_python)
+# language_tool_python

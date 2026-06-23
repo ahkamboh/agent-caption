@@ -25,8 +25,10 @@ def venv_python():
 
 def main():
     ap = argparse.ArgumentParser(description="local-caption setup")
-    ap.add_argument("--large", action="store_true",
-                    help="also pre-download whisper-large-v3 (~1.5GB) for best accuracy (--accurate)")
+    ap.add_argument("--small", action="store_true",
+                    help="also pre-download the small model (~460MB) for --fast speed mode")
+    ap.add_argument("--grammar", action="store_true",
+                    help="also install the offline homophone/grammar fixer (language_tool_python; needs Java)")
     args = ap.parse_args()
     print("== local-caption setup ==")
 
@@ -60,24 +62,33 @@ def main():
         print("   https://pytorch.org/get-started/locally/ into ./.venv-whisperx, then re-run setup.")
         sys.exit(r.returncode)
 
-    # Pre-fetch the Whisper 'small' model so the first caption is instant (clone -> setup -> ready).
-    print("-- downloading the Whisper 'small' model (~460 MB, one-time) --")
-    if subprocess.run([py, "-c", "import whisper; whisper.load_model('small')"]).returncode == 0:
-        print("ok: Whisper model ready")
+    # Pre-fetch the DEFAULT model (large-v3) so the first caption is instant AND max accuracy.
+    print("-- downloading the default model: Whisper large-v3 (~1.5 GB, one-time, best accuracy) --")
+    if subprocess.run([py, "-c", "from faster_whisper import WhisperModel; "
+                       "WhisperModel('large-v3', device='cpu', compute_type='int8')"]).returncode == 0:
+        print("ok: large-v3 ready (the default — no flag needed)")
     else:
-        print("   (couldn't pre-fetch the model; it will auto-download on your first caption instead)")
+        print("   (couldn't pre-fetch large-v3; it will auto-download on your first caption instead)")
 
-    if args.large:
-        print("-- downloading whisper-large-v3 (~1.5 GB, for --accurate) --")
-        subprocess.run([py, "-c", "from faster_whisper import WhisperModel; "
-                        "WhisperModel('large-v3', device='cpu', compute_type='int8')"])
+    if args.small:
+        print("-- also downloading the small model (~460 MB, for --fast) --")
+        subprocess.run([py, "-c", "import whisper; whisper.load_model('small')"])
+
+    if args.grammar:
+        print("-- installing language_tool_python (offline homophone/grammar fix, for --grammar) --")
+        subprocess.run([py, "-m", "pip", "install", "language_tool_python"])
+        if shutil.which("java") is None:
+            print("   note: Java not found — --grammar needs a JRE 8+.")
+            print("         macOS: brew install openjdk | Ubuntu: sudo apt install default-jre | Windows: winget install Microsoft.OpenJDK.21")
 
     rel = r".venv-whisperx\Scripts\python" if os.name == "nt" else "./.venv-whisperx/bin/python"
     print("\n== done ==  engine + model + fonts ready.\n")
     print("Caption a video — one command:")
     print(f"  {rel} caption.py your_video.mp4")
     print(f"  {rel} caption.py your_video.mp4 --style hormozi       # pick a famous look")
+    print(f"  {rel} caption.py your_song.mp4 --content music        # songs: isolate vocals (demucs) first")
     print("Styles: clean bold hormozi green beast impact bebas tiktok pill boxed yellow neon gradient minimal subtitle")
+    print("(Demucs' htdemucs model auto-downloads ~80MB on your first --content music job.)")
 
 
 if __name__ == "__main__":

@@ -29,7 +29,14 @@ def whisperx_path(a):
     import whisperx
     device = "cpu"; compute = "int8"
     print(f"[align] whisperX '{a.model}' (faster-whisper)...", file=sys.stderr)
-    model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang)
+    # --initial-prompt biases the ASR toward supplied names/brands/slang (the glossary),
+    # so proper nouns stop being mis-heard. Older whisperx lacks asr_options -> fall back.
+    asr_options = {"initial_prompt": a.initial_prompt} if a.initial_prompt else None
+    try:
+        model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang,
+                                    asr_options=asr_options)
+    except TypeError:
+        model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang)
     audio = whisperx.load_audio(a.input)
     result = model.transcribe(audio, language=a.lang, batch_size=8)
     print("[align] forcing alignment...", file=sys.stderr)
@@ -71,11 +78,33 @@ def single_path(a):
     sys.path.insert(0, SDIR)
     import cs_transcribe, mms_align, validate_timing
     print(f"[align] single small+MMS_FA for '{lang}' (no whisperX aligner)...", file=sys.stderr)
-    cs_words, _ = cs_transcribe.transcribe(a.input, model_name=a.model, force_lang=lang)
+    cs_words, _ = cs_transcribe.transcribe(a.input, model_name=a.model, force_lang=lang,
+                                           initial_prompt=a.initial_prompt)
     display = [w["w"] for w in cs_words]
     if not display:
         return []
     timed = mms_align.force_align(a.input, display, lang=lang, window=None, refine=False)
+    tagged = [{"text": t["text"], "start": t["start"], "end": t["end"], "score": t["score"]} for t in timed]
+    cleaned, warns = validate_timing.validate(tagged, input_count=len(display))
+    if warns:
+        print(f"[align] validation: {len(warns)} warning(s)", file=sys.stderr)
+    return [{"text": c["text"], "start": c.get("start"), "end": c.get("end")} for c in cleaned]
+
+
+def script_path(a):
+    """User supplied the EXACT correct words (--script): skip ASR entirely and only
+    force-align them onto the waveform. Content accuracy is 100% (the words are given);
+    we compute nothing but their timing. Best for songs/scripts where the text exists."""
+    sys.path.insert(0, SDIR)
+    import mms_align, validate_timing
+    raw = open(a.script, encoding="utf-8").read() if os.path.exists(a.script) else a.script
+    display = raw.split()
+    if not display:
+        print("[align] --script was empty.", file=sys.stderr)
+        return []
+    print(f"[align] supplied script: {len(display)} words -> timing only, no ASR "
+          f"(100% content accuracy)", file=sys.stderr)
+    timed = mms_align.force_align(a.input, display, lang=(a.lang or "auto"), window=None, refine=False)
     tagged = [{"text": t["text"], "start": t["start"], "end": t["end"], "score": t["score"]} for t in timed]
     cleaned, warns = validate_timing.validate(tagged, input_count=len(display))
     if warns:
@@ -96,7 +125,11 @@ def main():
     ap.add_argument("--model-cs", dest="model_cs", default="large-v3",
                     help="faster-whisper model for code-switch transcription")
     ap.add_argument("--dual", nargs=2, default=None, metavar=("LANG_A", "LANG_B"))
-    ap.add_argument("--initial-prompt", dest="initial_prompt", default=None)
+    ap.add_argument("--initial-prompt", dest="initial_prompt", default=None,
+                    help="bias ASR toward these names/brands/slang (the glossary) so they aren't mis-heard")
+    ap.add_argument("--script", default=None,
+                    help="path to (or literal text of) the EXACT correct words/lyrics; skips ASR and only "
+                         "times them -> 100%% content accuracy when you already have the text")
     # router knobs
     ap.add_argument("--cs-scan-model", dest="cs_scan_model", default="small")
     ap.add_argument("--cs-min-seg-share", dest="cs_min_seg_share", type=float, default=0.20)
@@ -119,19 +152,22 @@ def main():
         print(json.dumps(_plan(), ensure_ascii=False, indent=2))
         return
 
-    mode = a.lang_mode
-    if mode == "auto":
-        plan = _plan()
-        sys.stderr.write(f"[align] router -> {plan['mode']} | {plan['reason']} | "
-                         f"scan {plan['scan_seconds']}s\n")
-        mode = plan["mode"]
-        if mode == "single" and plan.get("primary"):
-            a.lang = plan["primary"]
-
-    if mode == "code-switch":
-        words = universal_path(a)
+    if a.script:                # known-correct words supplied -> time them, skip ASR entirely
+        words = script_path(a)
     else:
-        words = single_path(a)
+        mode = a.lang_mode
+        if mode == "auto":
+            plan = _plan()
+            sys.stderr.write(f"[align] router -> {plan['mode']} | {plan['reason']} | "
+                             f"scan {plan['scan_seconds']}s\n")
+            mode = plan["mode"]
+            if mode == "single" and plan.get("primary"):
+                a.lang = plan["primary"]
+
+        if mode == "code-switch":
+            words = universal_path(a)
+        else:
+            words = single_path(a)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     json.dump(words, open(a.out, "w"), ensure_ascii=False, indent=2)
     print(f"[align] {len(words)} words (forced-aligned) -> {a.out}")
