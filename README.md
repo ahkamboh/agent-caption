@@ -9,6 +9,24 @@ Words come from speech recognition; **timing comes from forced alignment on the 
 
 ---
 
+## 🤖 Use it with any AI agent
+
+Open the folder in **Claude Code / Cursor / Codex / Grok** — they auto-read the pointer files, so just say *“caption ./myvideo.mp4”*. For any other agent, paste this:
+
+```
+You are a captioning agent. Read ./SKILL.md in this repo and follow it exactly.
+Goal: add accurate, perfectly-timed captions to the video/audio I give you,
+in any language (default English; Hinglish supported), for speech AND music.
+
+1. if ./.venv-whisperx isn't set up, run:  python setup.py
+2. ask me for the file path (and language if not English)
+3. caption it:  python caption.py <file>   (--hinglish, --content music,
+   --style <name>, --glossary "...", --script lyrics.txt as needed)
+4. show me the output path (<file>.captioned.mp4)
+```
+
+---
+
 ## 🚀 Quick start
 
 ```bash
@@ -49,12 +67,30 @@ Same command, add a flag:
 | **Default** | **English** |
 | **Mixed / code-switch** | **Hinglish** + any |
 
-<details open>
-<summary><b>All 99 languages it can caption</b></summary>
+**All 99 languages it can caption:**
 
-> Afrikaans · Albanian · Amharic · Arabic · Armenian · Assamese · Azerbaijani · Bashkir · Basque · Belarusian · Bengali · Bosnian · Breton · Bulgarian · Burmese · Cantonese · Catalan · Chinese · Croatian · Czech · Danish · Dutch · English · Estonian · Faroese · Finnish · French · Galician · Georgian · German · Greek · Gujarati · Haitian Creole · Hausa · Hawaiian · Hebrew · Hindi · Hungarian · Icelandic · Indonesian · Italian · Japanese · Javanese · Kannada · Kazakh · Khmer · Korean · Lao · Latin · Latvian · Lingala · Lithuanian · Luxembourgish · Macedonian · Malagasy · Malay · Malayalam · Maltese · Maori · Marathi · Mongolian · Nepali · Norwegian · Nynorsk · Occitan · Pashto · Persian · Polish · Portuguese · Punjabi · Romanian · Russian · Sanskrit · Serbian · Shona · Sindhi · Sinhala · Slovak · Slovenian · Somali · Spanish · Sundanese · Swahili · Swedish · Tagalog · Tajik · Tamil · Tatar · Telugu · Thai · Tibetan · Turkish · Turkmen · Ukrainian · Urdu · Uzbek · Vietnamese · Welsh · Yiddish · Yoruba
-
-</details>
+| | | | | |
+|---|---|---|---|---|
+| Afrikaans | Albanian | Amharic | Arabic | Armenian |
+| Assamese | Azerbaijani | Bashkir | Basque | Belarusian |
+| Bengali | Bosnian | Breton | Bulgarian | Burmese |
+| Cantonese | Catalan | Chinese | Croatian | Czech |
+| Danish | Dutch | English | Estonian | Faroese |
+| Finnish | French | Galician | Georgian | German |
+| Greek | Gujarati | Haitian Creole | Hausa | Hawaiian |
+| Hebrew | Hindi | Hungarian | Icelandic | Indonesian |
+| Italian | Japanese | Javanese | Kannada | Kazakh |
+| Khmer | Korean | Lao | Latin | Latvian |
+| Lingala | Lithuanian | Luxembourgish | Macedonian | Malagasy |
+| Malay | Malayalam | Maltese | Maori | Marathi |
+| Mongolian | Nepali | Norwegian | Nynorsk | Occitan |
+| Pashto | Persian | Polish | Portuguese | Punjabi |
+| Romanian | Russian | Sanskrit | Serbian | Shona |
+| Sindhi | Sinhala | Slovak | Slovenian | Somali |
+| Spanish | Sundanese | Swahili | Swedish | Tagalog |
+| Tajik | Tamil | Tatar | Telugu | Thai |
+| Tibetan | Turkish | Turkmen | Ukrainian | Urdu |
+| Uzbek | Vietnamese | Welsh | Yiddish | Yoruba |
 
 *Any language outside the 38 “frame-accurate” set still works — it just routes to MMS for timing. And with `--script` you can caption a language perfectly by supplying its text.*
 
@@ -104,24 +140,6 @@ local-caption/
 2. **Words** — Whisper transcribes the speech (or you supply them with `--script`).
 3. **Timing** — every word is force-aligned to the waveform, so it lands exactly on the sound.
 4. **Burn** — clean, proportional captions are rendered and overlaid → `*.captioned.mp4`.
-
----
-
-## 🤖 Use it with any AI agent
-
-Open the folder in **Claude Code / Cursor / Codex / Grok** — they auto-read the pointer files, so just say *“caption ./myvideo.mp4”*. For any other agent, paste this:
-
-```
-You are a captioning agent. Read ./SKILL.md in this repo and follow it exactly.
-Goal: add accurate, perfectly-timed captions to the video/audio I give you,
-in any language (default English; Hinglish supported), for speech AND music.
-
-1. if ./.venv-whisperx isn't set up, run:  python setup.py
-2. ask me for the file path (and language if not English)
-3. caption it:  python caption.py <file>   (--hinglish, --content music,
-   --style <name>, --glossary "...", --script lyrics.txt as needed)
-4. show me the output path (<file>.captioned.mp4)
-```
 
 ---
 
