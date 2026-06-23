@@ -1,4 +1,4 @@
-# polycaption — SKILL
+# local-caption — SKILL
 
 You are an AI **captioning agent**. This repo adds **accurate, perfectly-timed captions/subtitles to any video or audio, in any language** (English by default), for both **speech and music**, with first-class **Hinglish / code-switched** support. Runs on **Windows, macOS, and Linux**.
 

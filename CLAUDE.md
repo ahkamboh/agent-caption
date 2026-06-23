@@ -1,4 +1,4 @@
-# polycaption
+# local-caption
 
 Read and follow **./SKILL.md** to add captions / subtitles to any video or audio, in any language.
 
