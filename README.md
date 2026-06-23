@@ -1,17 +1,18 @@
 # 🎬 local-caption
 
-**Add captions to any video — in any language — with one command.**
-Free, open-source, and 100% local. Works for talking videos *and* songs, with first-class **Hinglish**.
+Add captions to any video, in any language — **100% local, no cloud**.
+Hinglish-first · speech + music · forced-alignment timing · free · MIT · for any AI agent.
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Python](https://img.shields.io/badge/python-3.10%2B-blue) ![Platforms](https://img.shields.io/badge/Windows%20·%20macOS%20·%20Linux-lightgrey) ![Local](https://img.shields.io/badge/100%25-local%20·%20offline-success) ![Languages](https://img.shields.io/badge/languages-99-orange)
 
-Words come from speech recognition; **timing comes from forced alignment on the waveform** — so captions never drift early or late, even if a word is spelled wrong. Nothing is uploaded. It just works.
-
 ---
 
-## 🤖 Use it with any AI agent
+## 🚀 Quick start
 
-Open the folder in **Claude Code / Cursor / Codex / Grok** — they auto-read the pointer files, so just say *“caption ./myvideo.mp4”*. For any other agent, paste this:
+### With any AI coding agent
+**Claude Code · Cursor · Codex** auto-read their pointer file (`CLAUDE.md` · `.cursorrules` · `AGENTS.md`) — open the folder and just say *“caption ./myvideo.mp4”*.
+
+With **Grok · GitHub Copilot · Windsurf · Cline · Aider · Continue · Gemini CLI · Zed · Roo Code** — or any chat agent — paste this:
 
 ```
 You are a captioning agent. Read ./SKILL.md in this repo and follow it exactly.
@@ -23,6 +24,12 @@ in any language (default English; Hinglish supported), for speech AND music.
 3. caption it:  python caption.py <file>   (--hinglish, --content music,
    --style <name>, --glossary "...", --script lyrics.txt as needed)
 4. show me the output path (<file>.captioned.mp4)
+```
+
+### Or in the terminal
+```bash
+python setup.py                 # one time: installs everything + the model
+python caption.py myvideo.mp4   # → myvideo.captioned.mp4
 ```
 
 ---
@@ -37,17 +44,6 @@ in any language (default English; Hinglish supported), for speech AND music.
 | 📱 **TikTok · Reels · YouTube Shorts** | viral burned-in caption styles |
 | 🌍 **Any language + Hinglish** | 99 languages, code-switch built in |
 | ⏱ **Accurate word timestamps** | forced alignment → perfect `.srt` / `.vtt` |
-
----
-
-## 🚀 Quick start
-
-```bash
-python setup.py                 # one time: installs everything + the model
-python caption.py myvideo.mp4   # → myvideo.captioned.mp4
-```
-
-That's the whole thing. Captions are auto-sized to fit any video (landscape or vertical), English by default, best accuracy out of the box.
 
 ---
 
