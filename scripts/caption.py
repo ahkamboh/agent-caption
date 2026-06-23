@@ -75,7 +75,7 @@ def repo_root():
 def _mms_words(media, lang, content, model, root, venv, tmp):
     """Universal path: WORDS from small.pt, TIMING from MMS_FA forced alignment.
     Covers ANY language incl. pa/ur (which whisperX cannot reliably align)."""
-    cmd = ["python3", os.path.join(root, "scripts/transcribe.py"), media, "--model", model, "--out", tmp]
+    cmd = [sys.executable, os.path.join(root, "scripts/transcribe.py"), media, "--model", model, "--out", tmp]
     if lang:
         cmd += ["--lang", lang]
     subprocess.run(cmd, check=True)
@@ -102,7 +102,7 @@ def get_words(media, lang, aligner="auto", content="music", model="small", lang_
     aligner='mms' (or auto for pa/ur) -> universal MMS_FA forced alignment."""
     root = repo_root(); tmp = "work/_caption_words.json"
     os.makedirs("work", exist_ok=True)
-    venv = os.path.join(root, ".venv-whisperx/bin/python")
+    venv = sys.executable  # cross-platform: run caption.py with the venv python; sub-steps reuse it
     # SPEECH (auto) -> intelligent language router via align.py: single small (fast) when one
     # language, large-v3 code-switch only when genuinely mixed. The song/music path below is
     # UNTOUCHED (router is speech-only).
@@ -138,7 +138,7 @@ def get_words(media, lang, aligner="auto", content="music", model="small", lang_
             return json.load(open(tmp))
         sys.stderr.write("[caption] whisperX failed, falling back to small.pt\n"+r.stderr[-400:]+"\n")
     sys.stderr.write(f"[caption] transcribing with small.pt ({lang})...\n")
-    cmd = ["python3", os.path.join(root,"scripts/transcribe.py"), media, "--model",model,"--out",tmp]
+    cmd = [sys.executable, os.path.join(root,"scripts/transcribe.py"), media, "--model",model,"--out",tmp]
     if lang: cmd += ["--lang", lang]
     subprocess.run(cmd, check=True)
     return json.load(open(tmp))
