@@ -9,14 +9,6 @@ Hinglish-first · speech + music · forced-alignment timing · free · MIT · fo
 
 ## 🚀 Quick start
 
-Clone it (copy-paste):
-
-```bash
-git clone https://github.com/ahkamboh/local-caption
-cd local-caption
-python setup.py        # one-time: installs everything + downloads the model
-```
-
 ### With any AI coding agent
 Works with **Claude Code · Cursor · GitHub Copilot · ChatGPT · Gemini · Grok** — or any other.
 
