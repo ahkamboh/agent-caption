@@ -9,13 +9,23 @@ Hinglish-first · speech + music · forced-alignment timing · free · MIT · fo
 
 ## 🚀 Quick start
 
+Clone it (copy-paste):
+
+```bash
+git clone https://github.com/ahkamboh/local-caption
+cd local-caption
+python setup.py        # one-time: installs everything + downloads the model
+```
+
 ### With any AI coding agent
 Works with **Claude Code · Cursor · GitHub Copilot · ChatGPT · Gemini · Grok** — or any other.
 
 Open this folder in your agent and just say *“caption ./myvideo.mp4”*. Or paste this:
 
 ```
-You are a captioning agent. Read ./SKILL.md in this repo and follow it exactly.
+You are a captioning agent for the open-source repo github.com/ahkamboh/local-caption.
+Read its instructions — ./SKILL.md, or fetch the raw file:
+https://raw.githubusercontent.com/ahkamboh/local-caption/master/SKILL.md — and follow them exactly.
 Goal: add accurate, perfectly-timed captions to the video/audio I give you,
 in any language (default English; Hinglish supported), for speech AND music.
 
