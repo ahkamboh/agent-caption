@@ -18,9 +18,9 @@
 </p>
 
 <p align="center">
-  <video src="https://ahkamboh.github.io/agent-caption/assets/demo.mp4" poster="assets/demo-poster.png" width="720" controls muted loop playsinline></video>
+  <img src="assets/demo.gif" width="720" alt="agent-caption demo — captions in 11 languages" />
   <br/>
-  <sub>▶ One video, captioned in <b>11 languages</b> — 1100+ supported · speech &amp; songs · 100% on-device</sub>
+  <sub>One video, captioned in <b>11 languages</b> — 1100+ supported · speech &amp; songs · 100% on-device · <a href="https://ahkamboh.github.io/agent-caption/assets/demo.mp4">▶ full video with audio</a></sub>
 </p>
 
 ---
