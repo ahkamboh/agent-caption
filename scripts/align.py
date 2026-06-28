@@ -158,12 +158,21 @@ def main():
     else:
         mode = a.lang_mode
         if mode == "auto":
-            plan = _plan()
-            sys.stderr.write(f"[align] router -> {plan['mode']} | {plan['reason']} | "
-                             f"scan {plan['scan_seconds']}s\n")
-            mode = plan["mode"]
-            if mode == "single" and plan.get("primary"):
-                a.lang = plan["primary"]
+            try:
+                plan = _plan()
+            except ModuleNotFoundError as e:
+                # lang_router (auto code-switch detection) is optional; without it,
+                # fall back to single-language mode so captioning still works.
+                sys.stderr.write(f"[align] router unavailable ({e.name}) -> single-language mode\n")
+                plan = None
+            if plan is not None:
+                sys.stderr.write(f"[align] router -> {plan['mode']} | {plan['reason']} | "
+                                 f"scan {plan['scan_seconds']}s\n")
+                mode = plan["mode"]
+                if mode == "single" and plan.get("primary"):
+                    a.lang = plan["primary"]
+            else:
+                mode = "single"
 
         if mode == "code-switch":
             words = universal_path(a)
