@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>local-caption — captions for any video, in any language, 100% local</title>
+  <title>agent-caption — captions for any video, in any language, 100% local</title>
   <meta name="description" content="Free, open-source captioning that any AI agent can run. Add accurate, perfectly-timed captions/subtitles to any video or song in 99 languages (Hinglish-first), for speech and music. 100% local — nothing uploaded." />
-  <meta property="og:title" content="local-caption" />
+  <meta property="og:title" content="agent-caption" />
   <meta property="og:description" content="Add captions to any video, in any language — 100% local. Hinglish-first, speech + music, forced-alignment timing. Free, MIT, for any AI agent." />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -83,7 +83,7 @@
 <body>
   <div class="wrap">
     <nav>
-      <a class="brand" href="./" aria-label="local-caption home">
+      <a class="brand" href="./" aria-label="agent-caption home">
         <svg class="logo" width="30" height="30" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs><linearGradient id="lc" x1="6" y1="6" x2="42" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#ff6b4a"/><stop offset="1" stop-color="#ffd0a8"/></linearGradient></defs>
           <path d="M11 6h26a7 7 0 0 1 7 7v15a7 7 0 0 1-7 7H22l-8 7v-7h-3a7 7 0 0 1-7-7V13a7 7 0 0 1 7-7z" fill="url(#lc)"/>
@@ -92,9 +92,9 @@
           <rect x="11.5" y="23" width="9" height="3.6" rx="1.8" fill="#0c0c10" opacity=".4"/>
           <rect x="23" y="23" width="13.5" height="3.6" rx="1.8" fill="#0c0c10"/>
         </svg>
-        <span>local<b>-</b>caption</span>
+        <span>agent<b>-</b>caption</span>
       </a>
-      <a class="nav-link" href="https://github.com/ahkamboh/local-caption">GitHub ↗</a>
+      <a class="nav-link" href="https://github.com/ahkamboh/agent-caption">GitHub ↗</a>
     </nav>
 
     <header class="hero">
@@ -113,13 +113,13 @@
           <button class="copy2" id="copyPrompt" type="button">copy prompt</button>
         </div>
 <pre id="promptText"><span class="c"># paste me into your AI agent ↓</span>
-You are a captioning agent for the open-source repo github.com/ahkamboh/local-caption.
+You are a captioning agent for the open-source repo github.com/ahkamboh/agent-caption.
 It adds accurate, perfectly-timed captions to any video or song, in any language —
 100% on my machine, nothing uploaded.
 
 1. clone + set up (one time):
-   <span class="p">git clone https://github.com/ahkamboh/local-caption</span>
-   <span class="p">cd local-caption &amp;&amp; python setup.py</span>
+   <span class="p">git clone https://github.com/ahkamboh/agent-caption</span>
+   <span class="p">cd agent-caption &amp;&amp; python setup.py</span>
 2. read ./SKILL.md and follow it exactly.
 3. ask me for the file path (and the language if it isn't English).
 4. caption it:
@@ -132,8 +132,8 @@ If anything needs my input (file path, language, style), ask me first.</pre>
       </div>
 
       <div class="cta">
-        <a class="btn primary" href="https://github.com/ahkamboh/local-caption">View on GitHub</a>
-        <a class="btn ghost" href="https://github.com/ahkamboh/local-caption/blob/master/SKILL.md">Read the docs</a>
+        <a class="btn primary" href="https://github.com/ahkamboh/agent-caption">View on GitHub</a>
+        <a class="btn ghost" href="https://github.com/ahkamboh/agent-caption/blob/master/SKILL.md">Read the docs</a>
       </div>
 
       <div class="stats">
@@ -154,20 +154,20 @@ If anything needs my input (file path, language, style), ask me first.</pre>
     </section>
 
     <footer>
-      MIT · built by <a href="https://alihamzakamboh.com">Ali Hamza Kamboh</a> · <a href="https://github.com/ahkamboh/local-caption">github.com/ahkamboh/local-caption</a>
+      MIT · built by <a href="https://alihamzakamboh.com">Ali Hamza Kamboh</a> · <a href="https://github.com/ahkamboh/agent-caption">github.com/ahkamboh/agent-caption</a>
     </footer>
   </div>
 
   <script>
     // Canonical prompt text — what actually gets copied (kept in sync with the <pre> above).
     const PROMPT = [
-      'You are a captioning agent for the open-source repo github.com/ahkamboh/local-caption.',
+      'You are a captioning agent for the open-source repo github.com/ahkamboh/agent-caption.',
       'It adds accurate, perfectly-timed captions to any video or song, in any language —',
       '100% on my machine, nothing uploaded.',
       '',
       '1. clone + set up (one time):',
-      '   git clone https://github.com/ahkamboh/local-caption',
-      '   cd local-caption && python setup.py',
+      '   git clone https://github.com/ahkamboh/agent-caption',
+      '   cd agent-caption && python setup.py',
       '2. read ./SKILL.md and follow it exactly.',
       "3. ask me for the file path (and the language if it isn't English).",
       '4. caption it:',

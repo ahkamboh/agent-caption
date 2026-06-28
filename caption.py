@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-local-caption — ONE command: video in, captioned video out.
+agent-caption — ONE command: video in, captioned video out.
 
     python caption.py myvideo.mp4
 
@@ -266,7 +266,7 @@ def burn(video, cues, w, h, st, pos, size_pct, user_font, out):
 
 def main():
     ensure_venv()
-    ap = argparse.ArgumentParser(description="local-caption — captions for any video, one command.")
+    ap = argparse.ArgumentParser(description="agent-caption — captions for any video, one command.")
     ap.add_argument("video")
     ap.add_argument("--style", default="clean", choices=list(STYLES))
     ap.add_argument("--lang", default="en")
@@ -337,16 +337,16 @@ def main():
         do_isolate = a.content == "music"
         if a.content == "auto":
             is_music, why = iv.looks_like_music(a.video)
-            print(f"[local-caption] content probe -> {'music' if is_music else 'speech'} ({why})")
+            print(f"[agent-caption] content probe -> {'music' if is_music else 'speech'} ({why})")
             do_isolate = is_music
         if do_isolate:
-            print("[local-caption] isolating vocals (demucs) for cleaner transcription ...")
+            print("[agent-caption] isolating vocals (demucs) for cleaner transcription ...")
             stem = iv.isolate(a.video)
             if stem:
                 align_src = stem
-                print(f"[local-caption] aligning on isolated vocal stem -> {stem}")
+                print(f"[agent-caption] aligning on isolated vocal stem -> {stem}")
             else:
-                print("[local-caption] vocal isolation unavailable — using original audio.")
+                print("[agent-caption] vocal isolation unavailable — using original audio.")
 
     srt = a.from_srt
     if not srt:
@@ -354,12 +354,12 @@ def main():
         cmd = _py("scripts", "align.py") + [align_src, "--out", tj, "--model", model]
         if a.script:                       # known-correct words -> time only, 100% content accuracy
             cmd += ["--script", a.script, "--lang", a.lang]
-            print(f"[local-caption] using your script — timing only, no ASR (100% content accuracy) ...")
+            print(f"[agent-caption] using your script — timing only, no ASR (100% content accuracy) ...")
         else:
             cmd += (["--code-switch", "--dual", "hi", "en"] if a.hinglish else ["--lang", a.lang])
             if glossary:
                 cmd += ["--initial-prompt", glossary]
-            print(f"[local-caption] transcribing + aligning "
+            print(f"[agent-caption] transcribing + aligning "
                   f"({'hinglish' if a.hinglish else a.lang}, {model}"
                   f"{', glossary' if glossary else ''}) ...")
         if subprocess.run(cmd).returncode != 0 or not os.path.exists(tj):
@@ -368,13 +368,13 @@ def main():
         srt = os.path.join("work", f"{base}.srt")
 
     if a.grammar:                          # offline homophone/grammar fix (timing untouched)
-        print("[local-caption] grammar/homophone pass (offline) ...")
+        print("[agent-caption] grammar/homophone pass (offline) ...")
         subprocess.run(_py("scripts", "grammar_fix.py") + [srt, "--lang", a.lang], check=False)
 
     if a.translate:
         subprocess.run(_py("scripts", "multilang-subs.py") + [srt, "--to", a.translate], check=False)
     if a.srt:
-        print(f"[local-caption] subtitles -> {srt}")
+        print(f"[agent-caption] subtitles -> {srt}")
         return
 
     # effective style = chosen preset + any custom overrides (so users can describe any look)
@@ -398,10 +398,10 @@ def main():
     w, h = probe_dims(a.video)
     out = a.out or f"{base}.captioned.mp4"
     fs = round(h * (a.size if a.size else st["size"]) / 100.0)
-    print(f"[local-caption] burning '{a.style}' — {w}x{h}, {fs}px, {a.pos} -> {out}")
+    print(f"[agent-caption] burning '{a.style}' — {w}x{h}, {fs}px, {a.pos} -> {out}")
     if not burn(a.video, cues, w, h, st, a.pos, a.size, a.font, out):
         sys.exit("!! burn failed.")
-    print(f"[local-caption] done -> {out}")
+    print(f"[agent-caption] done -> {out}")
 
     # fast QA gate (deterministic, no tokens): cue sanity + output validity -> work/<base>.qa.json
     qa_cmd = _py("scripts", "qa.py") + [a.video, out, srt]

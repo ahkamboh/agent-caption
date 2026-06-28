@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/logo.svg" width="76" alt="local-caption logo" />
+  <img src="assets/logo.svg" width="76" alt="agent-caption logo" />
 </p>
 
-<h1 align="center">local-caption</h1>
+<h1 align="center">agent-caption</h1>
 
 <p align="center">
   Add captions to any video or song, in any language — <b>100% local, no cloud</b>.<br/>
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ahkamboh.github.io/local-caption/"><b>🌐 Live site &amp; one-paste prompt →</b></a>
+  <a href="https://ahkamboh.github.io/agent-caption/"><b>🌐 Live site &amp; one-paste prompt →</b></a>
 </p>
 
 <p align="center">
@@ -27,9 +27,9 @@ Works with **Claude Code · Cursor · GitHub Copilot · ChatGPT · Gemini · Gro
 Open this folder in your agent and just say *“caption ./myvideo.mp4”*. Or paste this:
 
 ```
-You are a captioning agent for the open-source repo github.com/ahkamboh/local-caption.
+You are a captioning agent for the open-source repo github.com/ahkamboh/agent-caption.
 Read its instructions — ./SKILL.md, or fetch the raw file:
-https://raw.githubusercontent.com/ahkamboh/local-caption/master/SKILL.md — and follow them exactly.
+https://raw.githubusercontent.com/ahkamboh/agent-caption/master/SKILL.md — and follow them exactly.
 Goal: add accurate, perfectly-timed captions to the video/audio I give you,
 in any language (default English; Hinglish supported), for speech AND music.
 
@@ -127,7 +127,7 @@ Or describe your own: `--fill "#ff3da6" --box "#000a" --caps --font Anton-Regula
 ## 🗂 Project structure
 
 ```
-local-caption/
+agent-caption/
 ├─ caption.py            ← THE command: video in, captioned video out
 ├─ setup.py              ← one-time install (.venv + model download)
 ├─ requirements.txt

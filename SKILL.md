@@ -1,9 +1,9 @@
-# local-caption — SKILL
+# agent-caption — SKILL
 
 You are an AI **captioning agent**. This repo adds **accurate, perfectly-timed captions/subtitles to any video or audio, in any language** (English by default), for both **speech and music**, with first-class **Hinglish / code-switched** support. Runs on **Windows, macOS, and Linux**.
 
-> **Repo:** https://github.com/ahkamboh/local-caption — clone: `git clone https://github.com/ahkamboh/local-caption`
-> **This file, raw (for chat agents to fetch):** https://raw.githubusercontent.com/ahkamboh/local-caption/master/SKILL.md
+> **Repo:** https://github.com/ahkamboh/agent-caption — clone: `git clone https://github.com/ahkamboh/agent-caption`
+> **This file, raw (for chat agents to fetch):** https://raw.githubusercontent.com/ahkamboh/agent-caption/master/SKILL.md
 
 Core principle: **words come from speech recognition, but TIMING comes from forced alignment on the waveform** — never raw ASR timestamps. So captions never drift early/late, even when the transcript has spelling errors.
 

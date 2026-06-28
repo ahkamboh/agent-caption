@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""local-caption — cross-platform setup (Windows / macOS / Linux).
+"""agent-caption — cross-platform setup (Windows / macOS / Linux).
 
     python setup.py        (or: python3 setup.py)
 
@@ -24,13 +24,13 @@ def venv_python():
 
 
 def main():
-    ap = argparse.ArgumentParser(description="local-caption setup")
+    ap = argparse.ArgumentParser(description="agent-caption setup")
     ap.add_argument("--small", action="store_true",
                     help="also pre-download the small model (~460MB) for --fast speed mode")
     ap.add_argument("--grammar", action="store_true",
                     help="also install the offline homophone/grammar fixer (language_tool_python; needs Java)")
     args = ap.parse_args()
-    print("== local-caption setup ==")
+    print("== agent-caption setup ==")
 
     v = sys.version_info
     print(f"python {v.major}.{v.minor}.{v.micro}  ({sys.platform})")
