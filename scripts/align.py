@@ -32,11 +32,14 @@ def whisperx_path(a):
     # --initial-prompt biases the ASR toward supplied names/brands/slang (the glossary),
     # so proper nouns stop being mis-heard. Older whisperx lacks asr_options -> fall back.
     asr_options = {"initial_prompt": a.initial_prompt} if a.initial_prompt else None
+    # silero VAD: pyannote-audio 4.0.6 broke whisperX's bundled pyannote VAD
+    # (Binarize gets a generator, not a SlidingWindowFeature). silero is robust + installed.
     try:
         model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang,
-                                    asr_options=asr_options)
+                                    vad_method="silero", asr_options=asr_options)
     except TypeError:
-        model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang)
+        model = whisperx.load_model(a.model, device, compute_type=compute, language=a.lang,
+                                    vad_method="silero")
     audio = whisperx.load_audio(a.input)
     result = model.transcribe(audio, language=a.lang, batch_size=8)
     print("[align] forcing alignment...", file=sys.stderr)
